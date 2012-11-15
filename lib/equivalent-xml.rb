@@ -3,7 +3,7 @@ require 'nokogiri'
 module EquivalentXml
 
   class << self
-    
+
     DEFAULT_OPTS = { :element_order => false, :normalize_whitespace => true }
 
     # Determine if two XML documents or nodes are equivalent
@@ -59,15 +59,15 @@ module EquivalentXml
     def compare_documents(node_1, node_2, opts, &block)
       self.equivalent?(node_1.root,node_2.root,opts,&block)
     end
-    
+
     def compare_elements(node_1, node_2, opts, &block)
       (node_1.name == node_2.name) && self.compare_children(node_1,node_2,opts,&block)
     end
-    
+
     def compare_attributes(node_1, node_2, opts, &block)
       (node_1.name == node_2.name) && (node_1.value == node_2.value)
     end
-    
+
     def compare_text(node_1, node_2, opts, &block)
       if opts[:normalize_whitespace]
         node_1.text.strip.gsub(/\s+/,' ') == node_2.text.strip.gsub(/\s+/,' ')
@@ -75,11 +75,11 @@ module EquivalentXml
         node_1.text == node_2.text
       end
     end
-    
+
     def compare_cdata(node_1, node_2, opts, &block)
       node_1.text == node_2.text
     end
-    
+
     def compare_children(node_1, node_2, opts, &block)
       if ignore_content?(node_1, opts)
         # Stop recursion and state a match on the children
@@ -89,7 +89,7 @@ module EquivalentXml
         nodeset_2 = as_nodeset(node_2.children, opts)
         result = self.compare_nodesets(nodeset_1,nodeset_2,opts,&block)
       end
-      
+
       if node_1.respond_to?(:attribute_nodes)
         attributes_1 = node_1.attribute_nodes
         attributes_2 = node_2.attribute_nodes
@@ -97,15 +97,15 @@ module EquivalentXml
       end
       result
     end
-    
+
     def compare_nodesets(nodeset_1, nodeset_2, opts, &block)
       local_set_1 = nodeset_1.dup
       local_set_2 = nodeset_2.dup
-      
+
       if local_set_1.length != local_set_2.length
         return false
       end
-    
+
       local_set_1.each do |search_node|
         found_node = local_set_2.find { |test_node| self.equivalent?(search_node,test_node,opts,&block) }
 
@@ -134,16 +134,16 @@ module EquivalentXml
       # they do. And they're invisible. And they get corrupted easily.
       # So let's wilfully ignore them. And while we're at it, let's
       # ignore any class that doesn't know it has a namespace.
-      if args.all? { |node| not node.respond_to?(:namespace) } or 
+      if args.all? { |node| not node.respond_to?(:namespace) } or
          args.any? { |node| node.is_a?(Nokogiri::XML::CharacterData) }
            return true
       end
-      
+
       href1 = node_1.namespace.nil? ? '' : node_1.namespace.href
       href2 = node_2.namespace.nil? ? '' : node_2.namespace.href
       return href1 == href2
     end
-    
+
     private
     def as_node(data)
       if data.respond_to?(:node_type)
@@ -157,7 +157,7 @@ module EquivalentXml
         end
       end
     end
-    
+
     def as_nodeset(data, opts = {})
       ignore_proc = lambda do |child|
         child.node_type == Nokogiri::XML::Node::COMMENT_NODE ||
