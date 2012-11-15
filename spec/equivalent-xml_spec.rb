@@ -111,6 +111,18 @@ describe EquivalentXml do
     doc1.should_not be_equivalent_to(doc2).with_whitespace_intact
   end
 
+  it "should ignore leading whitespace #1" do
+    doc1 = Nokogiri::XML("<bar><foo /></bar>")
+    doc2 = Nokogiri::XML(" <bar><foo /></bar>")
+    doc1.should be_equivalent_to(doc2)
+  end
+
+  it "should ignore leading whitespace #2" do
+    doc1 = Nokogiri::XML("<?xml version='1.0' encoding='utf-8' ?><foo />")
+    doc2 = Nokogiri::XML(" <?xml version='1.0' encoding='utf-8' ?><foo />")
+    doc1.should be_equivalent_to(doc2)
+  end
+
   it "should ignore comment nodes" do
     doc1 = Nokogiri::XML("<doc xmlns='foo:bar'><first>foo  bar baz</first><second>things</second></doc>")
     doc2 = Nokogiri::XML(%{<doc xmlns='foo:bar'>
